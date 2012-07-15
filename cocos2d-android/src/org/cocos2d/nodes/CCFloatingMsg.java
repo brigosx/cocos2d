@@ -1,6 +1,7 @@
 package org.cocos2d.nodes;
 
 import org.cocos2d.actions.instant.CCCallFunc;
+import org.cocos2d.actions.interval.CCDelayTime;
 import org.cocos2d.actions.interval.CCFadeTo;
 import org.cocos2d.actions.interval.CCSequence;
 import org.cocos2d.layers.CCScene;
@@ -28,11 +29,12 @@ public class CCFloatingMsg extends CCNode {
 	  
 	  scene.addChild(lbl);
 	  
-	  CCFadeTo showIn  = CCFadeTo.action(duration, 255);
-	  CCFadeTo showOut = CCFadeTo.action(duration, 0);
+	  CCFadeTo showIn  = CCFadeTo.action(0.5f, 255);
+	  CCDelayTime wait = CCDelayTime.action(duration);
+	  CCFadeTo showOut = CCFadeTo.action(0.5f, 0);
 	  CCCallFunc func  = CCCallFunc.action(this, "removeChild");
 	  
-	  fader = CCSequence.actions(showIn, showOut, func);
+	  fader = CCSequence.actions(showIn, wait, showOut, func);
 	}
 	
 	public static CCFloatingMsg makeText(String msg) {
