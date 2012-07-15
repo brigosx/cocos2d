@@ -101,7 +101,9 @@ public class CCMenuItemSprite extends CCMenuItem implements CCRGBAProtocol {
         setContentSize(size);
     }
 
-    @Override
+   /* 
+   Correction made by BRigOSX - Prevents the displaying of double sprites -
+   @Override
     public void draw(GL10 gl) {
         if (isEnabled_) {
             if (isSelected_) {
@@ -118,7 +120,7 @@ public class CCMenuItemSprite extends CCMenuItem implements CCRGBAProtocol {
             else
                 normalImage_.draw(gl);
         }
-    }
+    }*/
 
     // CocosNodeRGBA protocol
     public void setOpacity(int opacity) {
