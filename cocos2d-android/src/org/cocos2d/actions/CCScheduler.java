@@ -185,7 +185,7 @@ public class CCScheduler {
         // updates with priority == 0
         synchronized (updates0) {
         	int len = updates0.size();
-	        for(int i=0; i < len; ++i) {
+	        for(int i=0; i < len; i++) { // BRIGOSX - 23JUL2012 - ++i produced Range Exceptions -
 	        	tListEntry e = updates0.get(i);
 	        	currentEntry = e;
 	            if( ! e.paused ) {
