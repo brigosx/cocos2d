@@ -1,7 +1,5 @@
 package org.cocos2d.menus;
 
-import javax.microedition.khronos.opengles.GL10;
-
 import org.cocos2d.nodes.CCNode;
 import org.cocos2d.protocols.CCRGBAProtocol;
 import org.cocos2d.types.CGSize;
@@ -40,16 +38,20 @@ public class CCMenuItemSprite extends CCMenuItem implements CCRGBAProtocol {
     /** the image used when the item is selected */
     protected CCNode selectedImage_;
     public void setSelectedImage(CCNode image) {
-        assert(image!=null):"Cann't set selectedImage_ to be null!";
-        if( image != selectedImage_ ) {
-            image.setAnchorPoint(0,0);
-            image.setVisible(false);
+        //assert(image!=null):"Cann't set selectedImage_ to be null!";
+    	if( image != selectedImage_ ) {
+    		if(selectedImage_ != null) {
+    			removeChild(selectedImage_, true);	
+    		}
+    		
+    		if(image != null) {
+    			image.setAnchorPoint(0,0);
+    			image.setVisible(false);
+    			addChild(image);
+    		}
 
-            removeChild(selectedImage_, true);
-            addChild(image);
-
-            selectedImage_ = image;
-        }
+    		selectedImage_ = image;
+    	}
 
     }
     public CCNode getSelectedImage() {
@@ -168,7 +170,7 @@ public class CCMenuItemSprite extends CCMenuItem implements CCRGBAProtocol {
                 disabledImage_.setVisible(false);
         } else { // there is not selected image
             normalImage_.setVisible(true);
-            selectedImage_.setVisible(false);
+            //selectedImage_.setVisible(false); /* BRIGOSX 24JUL2012 - If it's NULL how could it be invisible??? -
             if (disabledImage_ != null)
                 disabledImage_.setVisible(false);
         }
@@ -178,7 +180,9 @@ public class CCMenuItemSprite extends CCMenuItem implements CCRGBAProtocol {
     public void unselected() {
         super.unselected();
         normalImage_.setVisible(true);
-        selectedImage_.setVisible(false);
+        if(selectedImage_ != null) {
+          selectedImage_.setVisible(false);
+        }
         if (disabledImage_ != null)
             disabledImage_.setVisible(false);
     }
@@ -189,18 +193,24 @@ public class CCMenuItemSprite extends CCMenuItem implements CCRGBAProtocol {
 
         if (enabled) {
             normalImage_.setVisible(true);
-            selectedImage_.setVisible(false);
+            if(selectedImage_ != null) {
+            	selectedImage_.setVisible(false);
+            }
             if( disabledImage_ != null ) {
             	disabledImage_.setVisible(false);
             }
         } else {
             if( disabledImage_ != null) {
                 normalImage_.setVisible(false);
-                selectedImage_.setVisible(false);
+                if(selectedImage_ != null) {
+                	selectedImage_.setVisible(false);
+                }
                 disabledImage_.setVisible(true);
             } else {
                 normalImage_.setVisible(true);
-                selectedImage_.setVisible(false);
+                if(selectedImage_ != null) {
+                	selectedImage_.setVisible(false);
+                }
 //                if (disabledImage_ != null)
 //                    disabledImage_.setVisible(false);
             }
@@ -208,4 +218,3 @@ public class CCMenuItemSprite extends CCMenuItem implements CCRGBAProtocol {
     }
 
 }
-
