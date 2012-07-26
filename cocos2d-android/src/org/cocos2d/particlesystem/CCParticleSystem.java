@@ -1,6 +1,10 @@
 package org.cocos2d.particlesystem;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -8,6 +12,7 @@ import org.cocos2d.actions.UpdateCallback;
 import org.cocos2d.config.ccConfig;
 import org.cocos2d.config.ccMacros;
 import org.cocos2d.nodes.CCNode;
+import org.cocos2d.nodes.CCTextureCache;
 import org.cocos2d.opengl.CCTexture2D;
 import org.cocos2d.protocols.CCTextureProtocol;
 import org.cocos2d.types.CGPoint;
@@ -17,7 +22,11 @@ import org.cocos2d.types.ccPointSprite;
 import org.cocos2d.types.util.CGPointUtil;
 import org.cocos2d.types.util.PoolHolder;
 import org.cocos2d.types.util.ccColor4FUtil;
+import org.cocos2d.utils.Base64;
 import org.cocos2d.utils.pool.OneClassPool;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 // typedef void (*CC_UPDATE_PARTICLE_IMP)(id, SEL, tCCParticle*, CGPoint);
 
@@ -1022,6 +1031,145 @@ public abstract class CCParticleSystem extends CCNode implements CCTextureProtoc
 
         return self;
         */
+    }
+    
+    public void loadParticleFile(HashMap<?,?> dictionary) {
+    	assert (dictionary != null) : "A dictionary object is expected.";
+    	
+    	// angle
+    	setAngle(((Number)dictionary.get("angle")).floatValue());
+    	setAngleVar(((Number)dictionary.get("angleVariance")).floatValue());
+
+    	// duration
+    	setDuration(((Number)dictionary.get("duration")).floatValue());
+
+    	// blend function 
+    	setBlendFunc(new ccBlendFunc(((Number)dictionary.get("blendFuncSource")).intValue(), 
+    			                     ((Number)dictionary.get("blendFuncDestination")).intValue()));
+
+    	// color
+    	float r,g,b,a;
+
+    	r = ((Number)dictionary.get("startColorRed")).floatValue();
+    	g = ((Number)dictionary.get("startColorGreen")).floatValue();
+    	b = ((Number)dictionary.get("startColorBlue")).floatValue();
+    	a = ((Number)dictionary.get("startColorAlpha")).floatValue();
+    	setStartColor(new ccColor4F(r,g,b,a));
+
+    	r = ((Number)dictionary.get("startColorVarianceRed")).floatValue();
+    	g = ((Number)dictionary.get("startColorVarianceGreen")).floatValue();
+    	b = ((Number)dictionary.get("startColorVarianceBlue")).floatValue();
+    	a = ((Number)dictionary.get("startColorVarianceAlpha")).floatValue();
+    	setStartColorVar(new ccColor4F(r,g,b,a));
+
+    	r = ((Number)dictionary.get("finishColorRed")).floatValue();
+    	g = ((Number)dictionary.get("finishColorGreen")).floatValue();
+    	b = ((Number)dictionary.get("finishColorBlue")).floatValue();
+    	a = ((Number)dictionary.get("finishColorAlpha")).floatValue();
+    	setEndColor(new ccColor4F(r,g,b,a));
+
+    	r = ((Number)dictionary.get("finishColorVarianceRed")).floatValue();
+    	g = ((Number)dictionary.get("finishColorVarianceGreen")).floatValue();
+    	b = ((Number)dictionary.get("finishColorVarianceBlue")).floatValue();
+    	a = ((Number)dictionary.get("finishColorVarianceAlpha")).floatValue();
+    	setEndColorVar(new ccColor4F(r,g,b,a));
+
+    	// particle size
+    	setStartSize(((Number)dictionary.get("startParticleSize")).floatValue());
+    	setStartSizeVar(((Number)dictionary.get("startParticleSizeVariance")).floatValue());
+    	setEndSize(((Number)dictionary.get("finishParticleSize")).floatValue());
+    	setEndSizeVar(((Number)dictionary.get("finishParticleSizeVariance")).floatValue());
+
+    	// position
+    	float x = ((Number)dictionary.get("sourcePositionx")).floatValue();
+    	float y = ((Number)dictionary.get("sourcePositiony")).floatValue();
+    	setPosition(CGPoint.ccp(x,y));
+    	setPosVar(CGPoint.ccp(((Number)dictionary.get("sourcePositionVariancex")).floatValue(),
+    	 		              ((Number)dictionary.get("sourcePositionVariancey")).floatValue()));
+
+    	setEmitterMode(((Number)dictionary.get("emitterType")).intValue());
+
+    	if(emitterMode == kCCParticleModeGravity) {
+    		// Mode A: Gravity + tangential accel + radial accel
+    		// gravity
+    		setGravity(CGPoint.ccp(((Number)dictionary.get("gravityx")).floatValue(),
+    				               ((Number)dictionary.get("gravityy")).floatValue()));
+
+    		//
+    		// speed
+    		setSpeed(((Number)dictionary.get("speed")).floatValue());
+    		setSpeedVar(((Number)dictionary.get("speedVariance")).floatValue());
+
+    		// radial acceleration
+    		setRadialAccel(((Number)dictionary.get("radialAcceleration")).floatValue());
+    		setRadialAccelVar(((Number)dictionary.get("radialAccelVariance")).floatValue());
+
+    		// tangential acceleration
+    		setTangentialAccel(((Number)dictionary.get("tangentialAcceleration")).floatValue());
+    		setTangentialAccelVar(((Number)dictionary.get("tangentialAccelVariance")).floatValue());
+    	}
+    	else {
+    		float maxRadius    = ((Number)dictionary.get("maxRadius")).floatValue();
+    		float maxRadiusVar = ((Number)dictionary.get("maxRadiusVariance")).floatValue();
+    		float minRadius    = ((Number)dictionary.get("minRadius")).floatValue();
+
+    		setStartRadius(maxRadius);
+    		setStartRadiusVar(maxRadiusVar);
+    		setEndRadius(minRadius);
+    		setEndRadiusVar(0);
+    		setRotatePerSecond(((Number)dictionary.get("rotatePerSecond")).floatValue());
+    		setRotatePerSecondVar(((Number)dictionary.get("rotatePerSecondVariance")).floatValue());
+    	}
+    	
+    	// life span
+    	setLife(((Number)dictionary.get("particleLifespan")).floatValue());
+    	setLifeVar(((Number)dictionary.get("particleLifespanVariance")).floatValue());				
+
+    	// emission Rate
+    	setEmissionRate(getTotalParticles()/getLife());
+
+    	// texture		
+    	// Try to get the texture from the cache
+    	String textureName = (String)dictionary.get("textureFileName");
+    	String textureData = (String)dictionary.get("textureImageData");
+
+    	if(new File(textureName).exists()) {
+    		try {
+    			CCTexture2D tex = CCTextureCache.sharedTextureCache().addImage(textureName);
+    			setTexture(tex);
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    		}
+    	}
+    	else if (textureData != null) {
+    		// if it fails, try to get it from the base64-gzipped data			
+    		byte[] buffer = null;
+
+    		try {
+    			buffer = Base64.decode(textureData);
+    		} catch (IOException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
+
+    		byte[] deflated = new byte[buffer.length];
+    		Inflater decompresser = new Inflater(false);
+
+    		int deflatedLen = 0;
+
+    		try {
+    			deflatedLen = decompresser.inflate(deflated);
+    		} catch (DataFormatException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
+
+    		Bitmap bmp = BitmapFactory.decodeByteArray(deflated, 0, deflatedLen);
+
+    		if(bmp != null) {
+    			setTexture(CCTextureCache.sharedTextureCache().addImage(bmp, textureName));
+    		}
+    	}
     }
 
 	//! Add a particle to the emitter

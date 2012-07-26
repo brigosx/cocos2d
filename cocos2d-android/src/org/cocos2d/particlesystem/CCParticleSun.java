@@ -1,16 +1,31 @@
 package org.cocos2d.particlesystem;
 
+import java.util.HashMap;
+
 import org.cocos2d.nodes.CCDirector;
 import org.cocos2d.nodes.CCTextureCache;
 import org.cocos2d.types.CGPoint;
 import org.cocos2d.types.CGSize;
 import org.cocos2d.types.ccBlendFunc;
+import org.cocos2d.utils.PlistParser;
 
 public class CCParticleSun extends CCQuadParticleSystem {
 
 	public static CCParticleSun node() {
 		return new CCParticleSun();
 	}
+	
+	public static CCParticleSun particleWithFile(String plistFile) {
+    	HashMap<String,Object> dictionary = PlistParser.parse(plistFile);
+    	assert (dictionary != null) : "Particle file not found.";
+
+    	int numParticles = ((Number)dictionary.get("maxParticles")).intValue();
+    	CCParticleSun particle = new CCParticleSun(numParticles); 
+
+    	particle.loadParticleFile(dictionary);
+    	
+    	return particle;
+    }
 	
 	public static CCParticleSun node(int p) {
 		return new CCParticleSun(p);

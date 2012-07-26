@@ -1,15 +1,30 @@
 package org.cocos2d.particlesystem;
 
+import java.util.HashMap;
+
 import org.cocos2d.nodes.CCDirector;
 import org.cocos2d.nodes.CCTextureCache;
 import org.cocos2d.types.CGPoint;
 import org.cocos2d.types.CGSize;
 import org.cocos2d.types.ccBlendFunc;
+import org.cocos2d.utils.PlistParser;
 
 public class CCParticleFireworks extends CCQuadParticleSystem {
 
     public static CCParticleSystem node() {
         return new CCParticleFireworks();
+    }
+    
+    public static CCParticleFireworks particleWithFile(String plistFile) {
+    	HashMap<String,Object> dictionary = PlistParser.parse(plistFile);
+    	assert (dictionary != null) : "Particle file not found.";
+
+    	int numParticles = ((Number)dictionary.get("maxParticles")).intValue();
+    	CCParticleFireworks particle = new CCParticleFireworks(numParticles); 
+
+    	particle.loadParticleFile(dictionary);
+    	
+    	return particle;
     }
 
     protected CCParticleFireworks() {

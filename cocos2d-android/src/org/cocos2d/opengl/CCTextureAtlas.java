@@ -19,7 +19,8 @@ import org.cocos2d.types.ccQuad2;
 import org.cocos2d.types.ccQuad3;
 import org.cocos2d.utils.CCFormatter;
 
-import com.badlogic.gdx.utils.BufferUtils;
+//import com.badlogic.gdx.utils.BufferUtils;
+import org.cocos2d.utils.BufferUtils;
 
 /** A class that implements a Texture Atlas.
  Supported features:
@@ -129,7 +130,7 @@ public class CCTextureAtlas {
     }
 
     public String toString() {
-        return new CCFormatter().format("<%s = %08X | getTotalQuads = %i>", CCTextureAtlas.class, this, totalQuads_);
+        return CCFormatter.format("<%s = %08X | getTotalQuads = %i>", CCTextureAtlas.class, this, totalQuads_);
     }
 
     public void initColorArray() {
@@ -445,7 +446,9 @@ public class CCTextureAtlas {
     	final int base = index * ccQuad2.size;
     	textureCoordinates.position(base);
     	
-    	BufferUtils.copy(src, textureCoordinates, src.capacity());
+    	//BufferUtils.copy(src, textureCoordinates, src.capacity());
+    	// BRIGOSX 26JUL2012 - The GDX library is either missing or not compatible to Android devices -
+    	textureCoordinates.put(src);
     	// if textureCoordinates.put(src) then allocation is performed
     	// this solution not efficient may be, need to find best way for copy Buffers
 //    	int num = src.capacity();
@@ -569,7 +572,9 @@ public class CCTextureAtlas {
     private void memcopyFloat(FloatBuffer src, int from, FloatBuffer dst, int to, int size) {
     	src.position(from);
     	dst.position(to);
-    	BufferUtils.copy(src, dst, size);
+    	//BufferUtils.copy(src, dst, size);
+    	// BRIGOSX 26JUL2012 - The GDX library is either missing or not compatible to Android devices -
+    	dst.put(src);
 //        for (int i = 0; i < size; i++) {
 //            dst.put(i + to, src.get(i + from));
 //        }
@@ -591,7 +596,9 @@ public class CCTextureAtlas {
     public static void memcopyByte(ByteBuffer src, int from, ByteBuffer dst, int to, int size) {
     	src.position(from);
     	dst.position(to);
-    	BufferUtils.copy(src, dst, size);
+    	//BufferUtils.copy(src, dst, size);
+    	// BRIGOSX 26JUL2012 - The GDX library is either missing or not compatible to Android devices -
+    	dst.put(src);
 //        for (int i = 0; i < size; i++) {
 //            dst.put(i + to, src.get(i + from));
 //        }
