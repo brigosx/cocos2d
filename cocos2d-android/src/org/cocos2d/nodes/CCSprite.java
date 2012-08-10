@@ -675,6 +675,9 @@ public class CCSprite extends CCNode implements CCRGBAProtocol, CCTextureProtoco
 
     /** returns whether or not a CCSpriteFrame is being displayed */
     public boolean isFrameDisplayed(CCSpriteFrame frame) {
+    	// BRIGOSX 10AUG2012 - Make sure you have a valid frame
+    	if(frame == null) return false;
+    	
         CGRect r = frame.rect_;
         CGPoint p = frame.offset_;
         return (CGRect.equalToRect(r, rect_) &&
