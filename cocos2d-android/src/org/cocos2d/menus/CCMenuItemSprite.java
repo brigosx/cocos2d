@@ -77,6 +77,11 @@ public class CCMenuItemSprite extends CCMenuItem implements CCRGBAProtocol {
     public CCNode getDisabledImage(){
         return disabledImage_;
     }
+    
+    /** BRIGOSX 11AUG2012 -creates a menu with normal image only, useful for menu toggles */
+    public static CCMenuItemSprite item(CCNode normalSprite) {
+    	return new CCMenuItemSprite(normalSprite, null, null, null, null);
+    }
 
     /** creates a menu item with a normal and selected image*/
     public static CCMenuItemSprite item(CCNode normalSprite, CCNode selectedSprite) {
