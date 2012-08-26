@@ -24,6 +24,7 @@ import java.util.HashMap;
 
 import javax.microedition.khronos.opengles.GL;
 import javax.microedition.khronos.opengles.GL10;
+import javax.microedition.khronos.opengles.GL11Ext;
 import javax.microedition.khronos.opengles.GL11ExtensionPack;
 
 import org.cocos2d.nodes.CCDirector;
